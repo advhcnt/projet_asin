@@ -140,10 +140,11 @@ sujet. Un identifiant inconnu renvoie `404`.
 
 - **Trace** : les n° 632, 644 et 681 occupent le 10/11/2026 à 09:00 ; le
   n° 697 est créé ensuite et accepté (`201`), soit quatre rendez-vous.
-- **Cause probable** : erreur de borne dans le contrôle de capacité
-  (`count > 3` au lieu de `count >= 3`), ou comptage des rendez-vous annulés,
-  ou encore vérification puis insertion non atomiques (deux requêtes
-  concurrentes lisent 2 puis insèrent toutes les deux).
+- **Cause probable** : les créations sont espacées de plusieurs heures —
+  n° 632 le 28/10, 644 le 30/10, 681 le 02/11, puis 697 le 04/11 — ce qui
+  exclut une course entre requêtes concurrentes. Le contrôle de capacité est
+  simplement trop permissif : il autorise un 4e occupant (borne `count > 3`
+  au lieu de `count >= 3`, ou test équivalent).
 - **Correction** : `controlerDisponibilites()` compte les rendez-vous
   **non annulés** du créneau et refuse dès le 4e (`409`, « Ce créneau est
   complet. »). La création s'exécute dans une transaction **Serializable**
@@ -199,8 +200,12 @@ sujet. Un identifiant inconnu renvoie `404`.
 - **Trace** : sur 13 rendez-vous, la page 1 renvoie 9 dates dans un ordre
   incohérent (28/07, 25/09, 21/04, 19/05, 16/06, 12/02, 11/08, 08/05, 07/07) ;
   celui du 02/12 n'apparaît pas.
-- **Cause probable** : tri par `id` ou `cree_le` au lieu de `date_heure`, tri
-  après le `LIMIT/OFFSET`, et/ou taille de page erronée (9 au lieu de 10).
+- **Cause probable** : tri lexicographique décroissant sur la date
+  **formatée** (`JJ/MM/AAAA`) au lieu de `date_heure`. Les 9 dates de la trace
+  sont exactement les 9 plus grandes chaînes de la série : `28/07` > `25/09` >
+  `21/04` > `19/05` > `16/06` > `12/02` > `11/08` > `08/05` > `07/07`. La 10e
+  serait le `05/01/2026`. `02/12/2026` commence par « 02 » et se retrouve donc
+  en fin de tri, hors de la première page.
 - **Correction** : `trierEtPaginer()` trie la liste complète — prochain
   rendez-vous **confirmé à venir** en tête, puis les autres par date
   décroissante — puis découpe 10 par page. L'API expose `total` et
