@@ -72,6 +72,21 @@ export function parserDateBenin(valeur: unknown): Date | null {
   return construireDate(Number(annee), Number(mois), Number(jour));
 }
 
+/**
+ * Construit une heure du Bénin (`AAAA-MM-JJTHH:MM`) pour appeler le module.
+ * Contrairement à `parserDateHeureBenin`, une saisie invalide lève une erreur
+ * explicite : c'est la forme recommandée dans les tests et par le jury.
+ */
+export function heureBenin(valeur: string): Date {
+  const date = parserDateHeureBenin(valeur);
+  if (!date) {
+    throw new Error(
+      `Heure du Bénin invalide : « ${valeur} » (attendu AAAA-MM-JJTHH:MM).`,
+    );
+  }
+  return date;
+}
+
 /** `14/11/2026 10:00` */
 export function formaterDateHeure(date: Date): string {
   return `${deuxChiffres(date.getUTCDate())}/${deuxChiffres(

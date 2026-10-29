@@ -33,7 +33,7 @@ Commandes utiles :
 
 | Commande | Rôle |
 | --- | --- |
-| `npm test` | exécute les tests Vitest (28 tests) |
+| `npm test` | exécute les tests Vitest (31 tests) |
 | `npm run test:watch` | tests en surveillance |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
@@ -45,7 +45,7 @@ Les tests sont **indépendants de la base et du réseau** : ils appellent
 directement `lib/rendez-vous/` avec une heure courante injectée.
 
 ```
-tests/regles.test.ts  28 tests — TMA-101 à TMA-107 + cas limites
+tests/regles.test.ts  31 tests — TMA-101 à TMA-107 + cas limites
 ```
 
 ## Architecture
@@ -78,6 +78,22 @@ les accesseurs **UTC** portent l'heure murale du Bénin :
 `maintenantBenin()` convertit un instant réel dans cette convention.
 Prisma renvoie les `timestamp without time zone` de la base avec les mêmes
 composantes UTC, ce qui rend la conversion inutile en lecture.
+
+Pour construire une date dans un test ou un appel au module, utiliser
+`heureBenin()` plutôt que `new Date("2026-11-10T09:00")`, qui serait interprété
+dans le fuseau de la machine :
+
+```ts
+import { controlerPriseRendezVous, heureBenin } from "@/lib/rendez-vous";
+
+const resultat = controlerPriseRendezVous(
+  { npi: "0614253647", service: "CNI", dateHeure: "2026-11-24T09:00" },
+  { maintenant: heureBenin("2026-11-20T18:00"), rendezVous: [] },
+);
+```
+
+En production, l'heure courante se construit avec
+`maintenantBenin(new Date())`.
 
 ### API
 

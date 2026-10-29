@@ -5,6 +5,8 @@ import {
   controlerChangementStatut,
   controlerPriseRendezVous,
   estAnnulable,
+  heureBenin,
+  maintenantBenin,
   MESSAGES,
   trierEtPaginer,
   type RendezVousExistant,
@@ -310,6 +312,26 @@ describe("TMA-107 — deuxième rendez-vous à venir (comportement conforme)", (
       { maintenant: benin("2026-11-20T18:00"), rendezVous: [ancien] },
     );
     expect(resultat.ok).toBe(true);
+  });
+});
+
+describe("Convention de temps du Bénin", () => {
+  it("construit une heure murale du Bénin sans dépendre du fuseau de la machine", () => {
+    expect(heureBenin("2026-11-24T09:00").toISOString()).toBe(
+      "2026-11-24T09:00:00.000Z",
+    );
+  });
+
+  it("convertit un instant réel en heure du Bénin", () => {
+    expect(
+      maintenantBenin(new Date("2026-11-20T17:00:00.000Z")).toISOString(),
+    ).toBe("2026-11-20T18:00:00.000Z");
+  });
+
+  it("refuse une heure invalide avec un message explicite", () => {
+    expect(() => heureBenin("2026-11-24 09:00")).toThrow(
+      /AAAA-MM-JJTHH:MM/,
+    );
   });
 });
 
