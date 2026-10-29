@@ -1,0 +1,39 @@
+// Schéma des tables existantes de la base « unpetittest ».
+// Les noms de colonnes sont conservés à l'identique (snake_case) via @map.
+// Les dates sont des heures du Bénin stockées en timestamp sans fuseau.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model RendezVous {
+  id           Int                @id @default(autoincrement())
+  npi          String             @db.VarChar(20)
+  service      String             @db.VarChar(10)
+  dateHeure    DateTime           @map("date_heure") @db.Timestamp(6)
+  statut       String             @db.VarChar(10)
+  creeLe       DateTime           @map("cree_le") @db.Timestamp(6)
+  historique   HistoriqueStatut[]
+
+  @@index([npi])
+  @@index([dateHeure])
+  @@map("rendez_vous")
+}
+
+model HistoriqueStatut {
+  id            Int        @id @default(autoincrement())
+  rendezVousId  Int        @map("rendez_vous_id")
+  ancienStatut  String     @map("ancien_statut") @db.VarChar(10)
+  nouveauStatut String     @map("nouveau_statut") @db.VarChar(10)
+  modifieLe     DateTime   @map("modifie_le") @db.Timestamp(6)
+  modifiePar    String     @map("modifie_par") @db.VarChar(10)
+  rendezVous    RendezVous @relation(fields: [rendezVousId], references: [id])
+
+  @@index([rendezVousId])
+  @@map("historique_statuts")
+}

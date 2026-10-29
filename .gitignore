@@ -7,6 +7,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.freebuff
 
 # testing
 /coverage
@@ -30,6 +31,10 @@ pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# client Prisma généré
+/lib/generated
 
 # vercel
 .vercel
