@@ -85,6 +85,12 @@ export default function Page() {
           <li>Un seul rendez-vous à venir par usager.</li>
           <li>Annulation possible jusqu&apos;à 24 h avant.</li>
         </ul>
+        <Link
+          href="/demarche"
+          className="mt-3 inline-flex text-xs font-medium text-primary hover:underline"
+        >
+          Voir la démarche et les corrections apportées →
+        </Link>
       </section>
     </div>
   );
