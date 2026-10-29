@@ -234,10 +234,16 @@ export default function Page() {
           </p>
         </div>
 
+        <p className="text-xs text-muted-foreground">
+          Dépliez chaque ticket pour voir la règle, la trace, la cause, la
+          correction et le test associé.
+        </p>
+
         <div className="flex flex-col gap-2">
           {tickets.map((ticket) => (
             <details
               key={ticket.id}
+              open={ticket.id === "TMA-101"}
               className="group rounded-xl border border-border/70 bg-card open:border-ring/50"
             >
               <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 p-4 [&::-webkit-details-marker]:hidden">
